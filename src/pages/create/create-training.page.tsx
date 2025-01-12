@@ -61,7 +61,7 @@ const CreateTrainingSetPage: React.FC = () => {
                     weight: exercise.weight,
                     restTime: exercise.restTime,
                     observations: exercise.observations,
-                    image: base64Images, // Resultado das imagens convertidas
+                    image: base64Images,
                 };
             })
         );
@@ -122,7 +122,7 @@ const CreateTrainingSetPage: React.FC = () => {
     };
 
     return (
-        <div className="max-w-lg mx-auto mt-10">
+        <div className="max-w-lg mx-auto mt-2 p-4">
             <h1 className="text-xl font-bold mb-6">Create New Training Set</h1>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 {/* Group Name */}
