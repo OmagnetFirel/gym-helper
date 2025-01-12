@@ -1,4 +1,21 @@
-# React + TypeScript + Vite
+# Gym Helper
+
+## React + TypeScript + Vite
+
+## Funcionalidades
+
+- Cadastro de grupos de treino
+- Listagem de grupos de treino
+- Alternância entre temas claro e escuro
+
+## Tecnologias Utilizadas
+
+- [React](https://reactjs.org/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vitejs.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Radix UI](https://www.radix-ui.com/)
+- [React Hook Form](https://react-hook-form.com/)
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
@@ -48,3 +65,5 @@ export default tseslint.config({
   },
 })
 ```
+## Contribuição
+Contribuições são bem-vindas! Sinta-se à vontade para abrir uma issue ou enviar um pull request.
