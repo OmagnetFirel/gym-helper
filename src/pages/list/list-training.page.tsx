@@ -18,7 +18,7 @@ const trainingGroups: TrainingGroup[] = [
 
 const TrainingGroupsPage: React.FC = () => {
     return (
-        <div className="p-4">
+        <div className="p-4 max-w-lg mx-auto">
             <h1 className="text-2xl font-bold mb-4">Training Groups</h1>
             <ul className="space-y-2">
                 {trainingGroups.map((group, index) => (
