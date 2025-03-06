@@ -1,37 +1,28 @@
-
 import React from 'react';
-import {useForm, SubmitHandler} from 'react-hook-form';
-import {Input} from '@/components/ui/input';
-import {Button} from '@/components/ui/button';
-import {Label} from '@/components/ui/label';
-import {Textarea} from '@/components/ui/textarea';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useNavigate } from 'react-router-dom';
+import { useTraining } from '@/hooks/useTraining';
+import { CreateTrainingData, ExerciseFormData } from '@/types/training';
+import { APP_CONFIG } from '@/constants/config';
 
-interface TrainingSetFormData {
-    groupName: string;
-    groupReference: string;
-    exercises: Exercise[];
-}
-
-interface Exercise {
+interface TrainingFormData {
     name: string;
-    numberOfSets: number;
-    numberOfRepetitions: number;
-    weight: number;
-    restTime: number;
-    observations: string;
-    example: string;
-    image: FileList;
+    notes?: string;
+    exercises: ExerciseFormData[];
 }
 
-
-
-
-const CreateTrainingSetPage: React.FC = () => {
+const CreateTrainingPage: React.FC = () => {
+    const navigate = useNavigate();
+    const { createTraining, loading, error } = useTraining();
     const {
         register,
         handleSubmit,
-        formState: {errors},
-    } = useForm<TrainingSetFormData>();
+        formState: { errors },
+    } = useForm<TrainingFormData>();
 
     const convertImageToBase64 = (file: File): Promise<string> => {
         return new Promise<string>((resolve, reject) => {
@@ -42,53 +33,53 @@ const CreateTrainingSetPage: React.FC = () => {
         });
     };
 
-    const onSubmit: SubmitHandler<TrainingSetFormData> = async (data) => {
+    const onSubmit: SubmitHandler<TrainingFormData> = async (data) => {
+        try {
+            const updatedExercises = await Promise.all(
+                data.exercises.map(async (exercise) => {
+                    const base64Images = await Promise.all(
+                        Array.from(exercise.image).map((file) => convertImageToBase64(file))
+                    );
 
-        const existingData = localStorage.getItem('trainingData');
-        const parsedData = existingData ? JSON.parse(existingData) : {};
+                    return {
+                        id: crypto.randomUUID(),
+                        name: exercise.name,
+                        type: exercise.type,
+                        sets: exercise.numberOfSets,
+                        reps: exercise.numberOfRepetitions,
+                        weight: exercise.type === 'weight' ? exercise.weight : undefined,
+                        time: exercise.type === 'cardio' ? exercise.time : undefined,
+                        notes: exercise.observations,
+                        images: base64Images,
+                    };
+                })
+            );
 
-        const updatedExercises = await Promise.all(
-            data.exercises.map(async (exercise) => {
-                const base64Images = await Promise.all(
-                    Array.from(exercise.image).map((file) => convertImageToBase64(file))
-                );
-
-                return {
-                    name: exercise.name,
-                    example: exercise.example,
-                    numberOfSets: exercise.numberOfSets,
-                    numberOfRepetitions: exercise.numberOfRepetitions,
-                    weight: exercise.weight,
-                    restTime: exercise.restTime,
-                    observations: exercise.observations,
-                    image: base64Images, // Resultado das imagens convertidas
-                };
-            })
-        );
-
-        const updatedData = {
-            ...parsedData,
-            [data.groupReference]: {
-                groupName: data.groupName,
-                groupReference: data.groupReference,
+            const trainingData: CreateTrainingData = {
+                name: data.name,
+                date: new Date(),
                 exercises: updatedExercises,
-            },
-        };
-        console.log(updatedData);
-        localStorage.setItem('trainingData', JSON.stringify(updatedData));
+                notes: data.notes,
+            };
 
+            await createTraining(trainingData);
+            navigate(APP_CONFIG.ROUTES.LIST);
+        } catch (err) {
+            console.error('Error creating training:', err);
+        }
     };
-
 
     const [exercises, setExercises] = React.useState([
         {
             name: '',
-            example: null,
+            type: 'weight' as const,
             numberOfSets: 1,
             numberOfRepetitions: 1,
             weight: 0,
+            time: 0,
             restTime: 0,
             observations: '',
+            image: null as FileList | null,
         },
     ]);
 
@@ -97,12 +88,14 @@ const CreateTrainingSetPage: React.FC = () => {
             ...exercises,
             {
                 name: '',
-                example: null,
+                type: 'weight' as const,
                 numberOfSets: 1,
                 numberOfRepetitions: 1,
                 weight: 0,
+                time: 0,
                 restTime: 0,
                 observations: '',
+                image: null,
             },
         ]);
     };
@@ -121,160 +114,167 @@ const CreateTrainingSetPage: React.FC = () => {
         setExercises(updatedExercises);
     };
 
+    if (loading) {
+        return <div className="p-4 text-foreground">Salvando...</div>;
+    }
+
+    if (error) {
+        return <div className="p-4 text-destructive">Erro ao salvar treino: {error}</div>;
+    }
+
     return (
-        <div className="max-w-lg mx-auto mt-10">
-            <h1 className="text-xl font-bold mb-6">Create New Training Set</h1>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                {/* Group Name */}
-                <div>
-                    <Label htmlFor="groupName">Group Name</Label>
-                    <Input
-                        id="groupName"
-                        {...register('groupName', {required: true})}
-                        placeholder="Enter group name"
-                    />
-                    {errors.groupName && (
-                        <p className="text-red-500 text-sm">Group name is required.</p>
-                    )}
+        <div className="container py-6">
+            <div className="flex flex-col gap-6">
+                <div className="flex items-center justify-between">
+                    <h1 className="text-2xl font-bold text-foreground">Criar Novo Treino</h1>
+                    <Button 
+                        variant="outline"
+                        onClick={() => navigate(APP_CONFIG.ROUTES.LIST)}
+                    >
+                        Voltar
+                    </Button>
                 </div>
 
-                {/* Group Reference */}
-                <div>
-                    <Label htmlFor="groupReference">Group Reference</Label>
-                    <Input
-                        id="groupReference"
-                        {...register('groupReference', {required: true, maxLength: 1})}
-                        placeholder="Enter a single letter"
-                    />
-                    {errors.groupReference && (
-                        <p className="text-red-500 text-sm">
-                            A single letter is required for group reference.
-                        </p>
-                    )}
-                </div>
-
-                <h2 className="text-lg font-bold mt-6">Exercises</h2>
-                {exercises.map((exercise, index) => (
-                    <div key={index} className="border p-4 rounded mb-4">
-                        <h3 className="font-semibold">Exercise {index + 1}</h3>
-
-                        {/* Exercise Name */}
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                    <div className="grid gap-4">
                         <div>
-                            <Label htmlFor={`exerciseName-${index}`}>Exercise Name</Label>
-                                <Input
-                                    id={`exerciseName-${index}`}
-                                    value={exercise.name}
-                                    {...register(`exercises.${index}.name`, {required: true})}
-                                    onChange={(e) => updateExercise(index, 'name', e.target.value)}
-                                    placeholder="Exercise Name"
-                                />
-
-                        </div>
-
-                        {/* Image Upload */}
-                        <div>
-                            <Label htmlFor="image">Image Example</Label>
+                            <Label htmlFor="name" className="text-foreground">Nome do Treino</Label>
                             <Input
-                                id="image"
-                                type="file"
-                                {...register(`exercises.${index}.image`, {required: true})}
-                                accept="image/*"
+                                id="name"
+                                {...register('name', { required: true })}
+                                placeholder="Nome do Treino"
+                                className="text-foreground"
                             />
-                            {errors.exercises?.[index]?.image && (
-                                <p className="text-red-500 text-sm">An image is required.</p>
-                            )}
                         </div>
 
-                        {/* Number of Sets */}
                         <div>
-                            <Label htmlFor={`numberOfSets-${index}`}>Number of Sets</Label>
-                            <Input
-                                id={`numberOfSets-${index}`}
-                                type="number"
-                                {...register(`exercises.${index}.numberOfSets`, {required: true})}
-                                value={exercise.numberOfSets}
-                                onChange={(e) => updateExercise(index, 'numberOfSets', e.target.value)}
-                                placeholder="Number of Sets"
-                            />
-
-                        </div>
-
-                        {/* Repetitions Per Set */}
-                        <div>
-                            <Label htmlFor={`numberOfRepetitions-${index}`}>Repetitions Per Set</Label>
-                            <Input
-                                id={`numberOfRepetitions-${index}`}
-                                type="number"
-                                value={exercise.numberOfRepetitions}
-                                {...register(`exercises.${index}.numberOfRepetitions`, {required: true})}
-
-                                onChange={(e) => updateExercise(index, 'numberOfRepetitions', e.target.value)}
-                                placeholder="Repetitions Per Set"
-                            />
-
-                        </div>
-
-                        {/* Weight */}
-                        <div>
-                            <Label htmlFor={`weight-${index}`}>Weight (kg)</Label>
-                            <Input
-                                id={`weight-${index}`}
-                                type="number"
-                                value={exercise.weight}
-                                {...register(`exercises.${index}.weight`, {required: true})}
-
-                                onChange={(e) => updateExercise(index, 'weight', e.target.value)}
-                                placeholder="Weight (kg)"
-                            />
-
-                        </div>
-
-                        {/* Rest Time */}
-                        <div>
-                            <Label htmlFor={`restTime-${index}`}>Rest Time (seconds)</Label>
-                            <Input
-                                id={`restTime-${index}`}
-                                type="number"
-                                value={exercise.restTime}
-                                {...register(`exercises.${index}.restTime`, {required: true})}
-                                onChange={(e) => updateExercise(index, 'restTime', e.target.value)}
-                                placeholder="Rest Time (seconds)"
-                            />
-
-                        </div>
-
-                        {/* Observations */}
-                        <div>
-                            <Label htmlFor={`observations-${index}`}>Observations</Label>
+                            <Label htmlFor="notes" className="text-foreground">Observações</Label>
                             <Textarea
-                                id={`observations-${index}`}
-                                value={exercise.observations}
-                                {...register(`exercises.${index}.observations`, {required: false})}
-                                onChange={(e) => updateExercise(index, 'observations', e.target.value)}
-                                placeholder="Additional observations"
+                                id="notes"
+                                {...register('notes')}
+                                placeholder="Observações sobre o treino"
+                                className="text-foreground"
                             />
+                        </div>
+                    </div>
 
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-xl font-semibold text-foreground">Exercícios</h2>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={addExercise}
+                            >
+                                Adicionar Exercício
+                            </Button>
                         </div>
 
-                        <Button type="button" onClick={() => removeExercise(index)} className="mt-2">
-                            Remove Exercise
+                        {exercises.map((exercise, index) => (
+                            <div key={index} className="border p-4 rounded-lg bg-card">
+                                <div className="grid gap-4">
+                                    <div className="flex items-center justify-between">
+                                        <Label htmlFor={`name-${index}`} className="text-foreground">Nome do Exercício</Label>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={() => removeExercise(index)}
+                                            className="text-destructive hover:text-destructive/90"
+                                        >
+                                            Remover
+                                        </Button>
+                                    </div>
+
+                                    <Input
+                                        id={`name-${index}`}
+                                        {...register(`exercises.${index}.name`, { required: true })}
+                                        placeholder="Nome do Exercício"
+                                        className="text-foreground"
+                                    />
+
+                                    <div>
+                                        <Label htmlFor={`type-${index}`} className="text-foreground">Tipo de Exercício</Label>
+                                        <select
+                                            id={`type-${index}`}
+                                            {...register(`exercises.${index}.type`, { required: true })}
+                                            value={exercise.type}
+                                            onChange={(e) => updateExercise(index, 'type', e.target.value)}
+                                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                        >
+                                            <option value="weight">Musculação</option>
+                                            <option value="cardio">Cardio</option>
+                                        </select>
+                                    </div>
+
+                                    {exercise.type === 'weight' ? (
+                                        <div>
+                                            <Label htmlFor={`weight-${index}`} className="text-foreground">Peso (kg)</Label>
+                                            <Input
+                                                id={`weight-${index}`}
+                                                type="number"
+                                                {...register(`exercises.${index}.weight`)}
+                                                placeholder="Peso (kg)"
+                                                className="text-foreground"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div>
+                                            <Label htmlFor={`time-${index}`} className="text-foreground">Tempo (minutos)</Label>
+                                            <Input
+                                                id={`time-${index}`}
+                                                type="number"
+                                                {...register(`exercises.${index}.time`)}
+                                                placeholder="Tempo (minutos)"
+                                                className="text-foreground"
+                                            />
+                                        </div>
+                                    )}
+
+                                    <div>
+                                        <Label htmlFor={`sets-${index}`} className="text-foreground">Número de Séries</Label>
+                                        <Input
+                                            id={`sets-${index}`}
+                                            type="number"
+                                            {...register(`exercises.${index}.numberOfSets`, { required: true })}
+                                            placeholder="Número de Séries"
+                                            className="text-foreground"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <Label htmlFor={`reps-${index}`} className="text-foreground">Repetições por Série</Label>
+                                        <Input
+                                            id={`reps-${index}`}
+                                            type="number"
+                                            {...register(`exercises.${index}.numberOfRepetitions`, { required: true })}
+                                            placeholder="Repetições por Série"
+                                            className="text-foreground"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <Label htmlFor={`notes-${index}`} className="text-foreground">Observações</Label>
+                                        <Textarea
+                                            id={`notes-${index}`}
+                                            {...register(`exercises.${index}.observations`)}
+                                            placeholder="Observações do exercício"
+                                            className="text-foreground"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="flex justify-end">
+                        <Button type="submit">
+                            Criar Treino
                         </Button>
                     </div>
-                ))}
-
-
-                <Button type="button" onClick={addExercise} className="w-full">
-                    Add Exercise
-                </Button>
-
-
-                {/* Submit Button */}
-                <Button type="submit" className="w-full">
-                    Create Training Set
-                </Button>
-            </form>
+                </form>
+            </div>
         </div>
     );
 };
 
-export default CreateTrainingSetPage;
+export default CreateTrainingPage;
