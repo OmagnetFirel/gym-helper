@@ -169,8 +169,8 @@ const TrainingPage: React.FC = () => {
     }
 
     return (
-        <div className="p-4">
-            <div className="bg-background border rounded-lg shadow-md p-6">
+        <div className="p-4 max-w-lg mx-auto">
+                <div className="bg-background border rounded-lg shadow-md p-6">
                 <div className="flex justify-between items-center mb-4">
                     <div>
                         <h2 className="text-2xl font-bold text-foreground">{training.name}</h2>
@@ -393,9 +393,9 @@ const TrainingPage: React.FC = () => {
                                         )}
                                     </div>
                                     {exercise.images && exercise.images.length > 0 && (
-                                        <div className="grid grid-cols-2 gap-4">
+                                        <div className="flex flex-wrap gap-2">
                                             {exercise.images.map((image, imgIndex) => (
-                                                <div key={imgIndex} className="relative group flex items-center justify-center">
+                                                <div key={imgIndex} className="relative group flex items-center justify-center w-full">
                                                     <div className="relative w-full aspect-square">
                                                         <img
                                                             src={image}

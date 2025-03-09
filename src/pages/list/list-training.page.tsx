@@ -78,7 +78,7 @@ const ListTrainingPage: React.FC = () => {
     }
 
     return (
-        <div className="container py-6">
+        <div className="p-4 max-w-lg mx-auto">
             <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold text-foreground">Meus Treinos</h1>
@@ -144,17 +144,19 @@ const ListTrainingPage: React.FC = () => {
                                 )}
                                 onClick={() => navigate(APP_CONFIG.ROUTES.TRAINING.replace(':id', training.id))}
                             >
-                                <Checkbox 
-                                    className="text-xs"
-                                    checked={selectedTrainings.includes(training.id)}
-                                    onClick={(e) => toggleTrainingSelection(training.id, e)}
-                                />
+    
+                                <BicepsFlexed className="text-muted-foreground" />
+
                                 <div className="text-lg font-medium text-foreground">
                                     {new Date(training.date).toLocaleDateString()}
                                 </div>
                                 <div className="text-xl flex-grow text-foreground">{training.name}</div>
                                 <div className="flex items-center gap-2">
-                                    <BicepsFlexed className="text-muted-foreground" />
+                                    <Checkbox 
+                                        className="text-xs"
+                                        checked={selectedTrainings.includes(training.id)}
+                                        onClick={(e) => toggleTrainingSelection(training.id, e)}
+                                    />
                                     <AlertDialog>
                                         <AlertDialogTrigger asChild>
                                             <Button 

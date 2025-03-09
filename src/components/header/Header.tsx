@@ -135,9 +135,9 @@ const Header: React.FC = () => {
     };
 
     return (
-        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <header className="sticky top-0 z-50  max-w-lg mx-auto border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container flex h-14 items-center justify-between">
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2 justify-between">
                     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                         <DialogTrigger asChild>
                             <Button variant="outline" size="icon" className="flex items-center gap-2 text-foreground hover:text-foreground/80" title="Importar Planilha">
@@ -150,6 +150,15 @@ const Header: React.FC = () => {
                                 <DialogDescription className="text-muted-foreground">
                                     Selecione uma planilha Excel com seus treinos. A planilha deve estar formatada corretamente.
                                 </DialogDescription>
+                                <div className="mt-2">
+                                    <a 
+                                        href="/MODELO_TREINO.xlsx" 
+                                        download="modelo_treino.xlsx"
+                                        className="text-primary hover:text-primary/90 underline"
+                                    >
+                                        Baixar planilha de exemplo
+                                    </a>
+                                </div>
                             </DialogHeader>
                             <div className="grid gap-4 py-4">
                                 <Input
@@ -177,8 +186,9 @@ const Header: React.FC = () => {
                         <List className="h-4 w-4" />
                         Listar Treinos
                     </Button>
+                    <ModeToggle />
+
                 </div>
-                <ModeToggle />
             </div>
         </header>
     );

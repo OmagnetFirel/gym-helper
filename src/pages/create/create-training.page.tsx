@@ -122,7 +122,7 @@ const CreateTrainingPage: React.FC = () => {
     }
 
     return (
-        <div className="container py-6">
+        <div className="p-4 max-w-lg mx-auto">        
             <div className="flex flex-col gap-6">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold text-foreground">Criar Novo Treino</h1>
