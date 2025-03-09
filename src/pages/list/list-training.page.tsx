@@ -74,7 +74,7 @@ const ListTrainingPage: React.FC = () => {
     }
 
     if (error) {
-        return <div className="p-4 text-red-500">Erro ao carregar treinos: {error}</div>;
+        return <div className="p-4 text-destructive">Erro ao carregar treinos: {error}</div>;
     }
 
     return (

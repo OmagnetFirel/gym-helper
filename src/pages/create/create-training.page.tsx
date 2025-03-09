@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -21,7 +21,6 @@ const CreateTrainingPage: React.FC = () => {
     const {
         register,
         handleSubmit,
-        formState: { errors },
     } = useForm<TrainingFormData>();
 
     const convertImageToBase64 = (file: File): Promise<string> => {
@@ -69,7 +68,7 @@ const CreateTrainingPage: React.FC = () => {
         }
     };
 
-    const [exercises, setExercises] = React.useState([
+    const [exercises, setExercises] = useState([
         {
             name: '',
             type: 'weight' as const,
