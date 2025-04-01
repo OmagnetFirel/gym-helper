@@ -134,7 +134,7 @@ const ListTrainingPage: React.FC = () => {
                     {trainings.map((training) => (
                         <li
                             key={training.id}
-                            className="border rounded-lg shadow-sm"
+                            className="border-2 border-solid border-indigo-800 rounded-lg shadow-sm"
                         >
                             <div
                                 className={clsx(

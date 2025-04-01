@@ -235,7 +235,7 @@ const TrainingPage: React.FC = () => {
 
                 <ul ref={exercisesListRef} className="space-y-4">
                     {training.exercises.map((exercise, index) => (
-                        <li key={exercise.id} className="p-4 bg-card rounded-lg shadow-sm border">
+                        <li key={exercise.id} className="p-4 bg-card rounded-lg shadow-sm border-2 border-solid border-indigo-800 rounded-lg shadow-sm">
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center">
                                     <div className="flex-1">

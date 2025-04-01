@@ -16,6 +16,7 @@ import { Training } from '@/types/training';
 import { useNavigate } from 'react-router-dom';
 import { APP_CONFIG } from '@/constants/config';
 import { ModeToggle } from './ModeToggle';
+import ExportDialog from './ExportDialog';
 
 interface ExcelRow {
     [key: string]: string | number;
@@ -23,9 +24,8 @@ interface ExcelRow {
 
 const Header: React.FC = () => {
     const navigate = useNavigate();
-    const { createTraining } = useTraining();
+    const { createTraining, trainings } = useTraining();
     const [isModalOpen, setIsModalOpen] = useState(false);
-
     const processExcelData = (data: ExcelRow[]): Partial<Training>[] => {
         let currentTraining: Partial<Training> | null = null;
         const trainings: Partial<Training>[] = [];
@@ -56,7 +56,7 @@ const Header: React.FC = () => {
 
                 let sets = 1;
                 let reps = 1;
-                let isCardio = exerciseName.toLowerCase().includes('cardio');
+                const isCardio = exerciseName.toLowerCase().includes('cardio');
                 let time: number | undefined;
 
                 if (setsReps) {
@@ -134,6 +134,7 @@ const Header: React.FC = () => {
         }
     };
 
+
     return (
         <header className="sticky top-0 z-50  max-w-lg mx-auto border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container flex h-14 items-center justify-between">
@@ -186,8 +187,8 @@ const Header: React.FC = () => {
                         <List className="h-4 w-4" />
                         Listar Treinos
                     </Button>
+                    <ExportDialog />
                     <ModeToggle />
-
                 </div>
             </div>
         </header>

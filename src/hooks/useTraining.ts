@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import {useState, useCallback} from 'react';
 import { Training, CreateTrainingData } from '@/types/training';
 import { trainingService } from '@/services/training.service';
 
@@ -19,6 +19,7 @@ export const useTraining = () => {
       setLoading(false);
     }
   }, []);
+
 
   const getTrainingById = useCallback(async (id: string) => {
     try {

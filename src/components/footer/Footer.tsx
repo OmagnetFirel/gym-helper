@@ -4,8 +4,8 @@ import { Badge } from "@/components/ui/badge";
 
 const Footer: React.FC = () => {
     return (
-        <footer className="w-full border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="container flex flex-col h-14 items-center gap-2 justify-center">
+        <footer className="w-full border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 justify-center align-middle flex">
+            <div className="container flex flex-col h-14 items-center gap-2 justify-center w-full">
                 <p className="text-sm text-muted-foreground">
                     © 2024 Gym Helper. Todos os direitos reservados.
                 </p>
