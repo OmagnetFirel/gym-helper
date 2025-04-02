@@ -25,20 +25,21 @@ const ExportDialog: React.FC = () => {
     const exportToCSV = () => {
         // Convert trainings to CSV format
         const csvContent = trainings.map(training => {
+
             const exercises = training.exercises.map(ex => {
                 const reps = ex.type === 'cardio' 
                     ? `${ex.time}min` 
                     : `${ex.sets}X${ex.reps}`;
-                return `${ex.name} (${reps})`;
+                return `${ex.name} (${reps}) ${ex.type === 'cardio' ? 'Cardio' : 'Musculação'}  ${ex.weight}kg ${ex.time}seg ${ex.images} ${ex.notes} `;
             }).join('; ');
-            
+
             return {
                 'Nome do Treino': training.name,
                 'Data': new Date(training.date).toLocaleDateString(),
                 'Exercícios': exercises
             };
         });
-
+        console.log(csvContent, 'csvContent');
         // Create worksheet
         const ws = XLSX.utils.json_to_sheet(csvContent);
         const wb = XLSX.utils.book_new();
@@ -80,6 +81,9 @@ const ExportDialog: React.FC = () => {
                         variant="outline" 
                         className="flex items-center gap-2 text-foreground hover:text-foreground/80"
                         onClick={exportToCSV}
+                        disabled={true}
+                        aria-label="Exportar como CSV"
+                        title="Desativado temporariamente"
                     >
                         Exportar como Excel
                     </Button>
@@ -87,6 +91,8 @@ const ExportDialog: React.FC = () => {
                         variant="outline" 
                         className="flex items-center gap-2 text-foreground hover:text-foreground/80"
                         onClick={exportToJSON}
+                        aria-label="Exportar como JSON"
+                        title="Exportar como JSON"
                     >
                         Exportar como JSON
                     </Button>
