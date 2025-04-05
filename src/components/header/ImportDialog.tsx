@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import {
@@ -22,6 +22,7 @@ interface ExcelRow {
 
 const ImportDialog:React.FC = () => {
     const { createTraining } = useTraining();
+    const [cFile, setFile] = useState<File | null>(null);
     const navigate = useNavigate();
 
     const processExcelData = (data: ExcelRow[]): Partial<Training>[] => {
@@ -145,18 +146,24 @@ const ImportDialog:React.FC = () => {
         }
     }
 
-    const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-        const fileExtension = file.name.split('.').pop()?.toLowerCase();
+    const handleFileUpload = async () => {
+        if (!cFile) return;
+        const fileExtension = cFile.name.split('.').pop()?.toLowerCase();
         if(fileExtension === 'xlsx' || fileExtension === 'xls' || fileExtension === 'csv') {
-            await handleCSV(file);
+            await handleCSV(cFile);
         }else {
-            await handleJson(file);
+            await handleJson(cFile);
         }
-
+        setFile(null);
+        navigate(APP_CONFIG.ROUTES.LIST, { replace: true });
     };
 
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setFile(file);
+        }
+    }
 
     return (
         <Dialog>
@@ -186,10 +193,20 @@ const ImportDialog:React.FC = () => {
                         <Input
                             type="file"
                             accept=".xlsx,.xls ,.csv,.json, .txt"
-                            onChange={handleFileUpload}
+                            onChange={handleFileChange}
                             className="text-foreground"
                         />
                     </div>
+                </div>
+                <div className="flex justify-end">
+                    <Button
+                        variant="outline"
+                        className="text-foreground hover:text-foreground/80"
+                        onClick={handleFileUpload}
+                        disabled={!cFile}
+                    >
+                        Importar
+                    </Button>
                 </div>
             </DialogContent>
         </Dialog>

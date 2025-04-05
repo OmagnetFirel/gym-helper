@@ -400,7 +400,7 @@ const TrainingPage: React.FC = () => {
                                                         <img
                                                             src={image}
                                                             alt={`${exercise.name} - Exemplo ${imgIndex + 1}`}
-                                                            className="rounded-lg w-full h-full object-cover"
+                                                            className="rounded-lg w-full h-full object-contain"
                                                         />
                                                         {isEditing && (
                                                             <button
